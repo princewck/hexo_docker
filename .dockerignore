@@ -1,0 +1,3 @@
+# 构建时忽略以下文件
+node_modules/*
+docs/*

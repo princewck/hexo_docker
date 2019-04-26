@@ -3,6 +3,7 @@ title: 在项目中愉快地使用svg图标
 tags: 前端工程化应用
 category: 前端开发
 date: 2019-04-26 09:45:56
+thumbnail: /images/wpp4.jpeg
 ---
 
 
@@ -156,7 +157,7 @@ import '/path/to/images.svg'; // 使用前先引入
 </style>
 ```
 
-5. 其他注意点
+5. 其他
 
 - 我们使用了currentColor，即取svg父元素的颜色来定义svg的颜色，所以对于多色图标有改变颜色需求时可能会不太好处理，如果彩色svg图没有变换色彩的需求，可以在svg文件中包含色彩样式定义。
 - 建议将svg文件的引入放在一个文件中统一维护，方便管理。
@@ -169,5 +170,6 @@ declare module '*.svg' {
   export default content;
 }
 ```
+- [iconfont](https://www.iconfont.cn)开源的图标搜索网站，提供svg, png, ai等多种格式，能满足常用的图标获取。
 
 // 待续...

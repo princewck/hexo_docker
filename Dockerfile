@@ -9,4 +9,4 @@ WORKDIR /app
 EXPOSE 4000/tcp
 
 RUN ["npm", "install", "--registry", "https://registry.npm.taobao.org"]
-ENTRYPOINT ["npx", "hexo", "server"]
+ENTRYPOINT ["npm", "publish"]

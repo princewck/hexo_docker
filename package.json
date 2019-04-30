@@ -9,7 +9,7 @@
     "start": "sh ./bin/start.sh",
     "stop": "sh ./bin/stop.sh",
     "restart": "sh ./bin/stop.sh & sh ./bin/start.sh",
-    "publish": "npx hexo clean & hexo generate"
+    "publish": "npx hexo clean & hexo generate & hexo server"
   },
   "dependencies": {
     "hexo": "^3.8.0",

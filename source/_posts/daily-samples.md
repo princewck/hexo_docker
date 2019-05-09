@@ -2,7 +2,6 @@
 title: 日常代码片段记录
 tags: 代码片段
 toc: true
-thumbnail: /images/wpp.jpeg
 category: web开发
 date: 2019-05-09 10:07:38
 thumbnail: /images/thumbnails/codesamples.jpeg

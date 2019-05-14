@@ -3,8 +3,11 @@
   - 如何构建自己的cli工具来自动化生成项目模版
   - 构建vscode extension 智能预测和模板输入
   - 从webpack入手，可多项目复用的模块打包方案
+  - webpack 插件开发
+  - postcss 插件开发
 
 2. 正则的高阶使用
+  - ? 有几种用途
 
 3. 基础扫盲
   encodeURI, encodeURIComponent, escape
@@ -35,7 +38,11 @@
   - git 版本管理
   - cdn文件操作
 
-9.
+9. 浏览器文档模式，meta标签整理
 
 
 
+> #### 写作工具
+> - [代码美化图片生成工具 ](https://carbon.now.sh/?bg=rgba(95%2C102%2C109%2C1)&t=cobalt&wt=none&l=javascript&ds=true&dsyoff=20px&dsblur=68px&wc=true&wa=true&pv=56px&ph=56px&ln=false&fm=Hack&fs=14px&lh=133%25&si=false&es=4x&wm=false)
+>
+>

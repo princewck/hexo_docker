@@ -40,7 +40,13 @@
 
 9. 浏览器文档模式，meta标签整理
 
+10. webpack 按需加载，分包策略，dva按需加载model分析
 
+11. Nginx进阶
+
+12. Docker compose, docker-swarm 集群管理
+
+13. NodeJs 核心概念和核心模块
 
 > #### 写作工具
 > - [代码美化图片生成工具 ](https://carbon.now.sh/?bg=rgba(95%2C102%2C109%2C1)&t=cobalt&wt=none&l=javascript&ds=true&dsyoff=20px&dsblur=68px&wc=true&wa=true&pv=56px&ph=56px&ln=false&fm=Hack&fs=14px&lh=133%25&si=false&es=4x&wm=false)

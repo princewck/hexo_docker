@@ -2,6 +2,7 @@
 title: 使用canvas实现最大内接矩形居中裁剪
 date: 2019-06-18 09:47:52
 tags: 前端开发
+thumbnail: /images/SEQUENCE.jpeg
 ---
 
 使用canvas的drawImage api我们可以在浏览器对图片的尺寸和质量进行一些自定义，下面是项目中用到的图片裁剪案例：给定任意尺寸图片，要求按照规定尺寸裁剪出默认符合要求的图片。

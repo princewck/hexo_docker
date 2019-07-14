@@ -2,7 +2,7 @@
 title: 【数据结构-3】图
 toc: true
 tags: mse 数据结构
-thumbnail: /images/thumbnails/ds2.jpeg
+thumbnail: /images/thumbnails/ds3.png
 category: '计算机基础'
 date: 2019-07-02 17:02:38
 ---

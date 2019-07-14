@@ -1,5 +1,5 @@
 ---
-title: 【数据结构】1基础概念
+title: 【数据结构-1】基础概念
 toc: true
 tags: mse 数据结构
 thumbnail: /images/thumbnails/ds1.jpeg

@@ -1,5 +1,5 @@
 ---
-title: 【数据结构】2树
+title: 【数据结构-2】树
 toc: true
 tags: mse 数据结构
 thumbnail: /images/thumbnails/ds2.jpeg

@@ -143,7 +143,7 @@ export default class RouteC extends Component {
 
 根据文档，Route 可以接受一个方法作为他的chindren，这个方法在路由切换时必然会被执行，而路由是否匹配我们可以根据该方法的 match 参数来推断。
 
-利用这个特性，我们可以借助这个match 参数将路由视图组件的创建和销毁的任务转交给`CSSTransition`来完成，将入场（也即组件创建）交给 in 来判断。in 判断结果为 false时，CSSTransition可以按自己的逻辑添加出场 exit class 来完成出场动画，当动画完成后 `unmountOnExit `告诉`CSSTransition`表演结束了，可以销毁组件了。
+利用这个特性，我们可以借助这个match 参数将路由视图组件的创建和销毁的任务转交给`CSSTransition`来完成，将入场（也即组件创建）交给 in 来判断。in 判断结果为 false时，CSSTransition可以按自己的逻辑添加出场 exit class 来完成出场动画，当动画完成后 `unmountOnExit `提示`CSSTransition`可以销毁组件了。
 
 经过以上分析，问题也就解决了，代码如下：
 

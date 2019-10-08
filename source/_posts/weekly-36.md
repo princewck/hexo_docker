@@ -2,7 +2,7 @@
 title: weekly-39
 date: 2019-09-26 10:37:52
 tags: 前端开发，周报
-thumbnail: '/images/photo-1499343628900-545067aef5a3.png'
+thumbnail: '/images/photo-1499343628900-545067aef5a3.jpeg'
 ---
 
 ## 1. 隐藏移动版 chorme 中 `video`标签的下载按钮

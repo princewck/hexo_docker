@@ -1,5 +1,24 @@
+<style>
+    .card-content.slim {
+      color: red;
+      max-height: 250px;
+      overflow: hidden;
+      margin-bottom: 25px;
+    }
+
+    .card-content.slim::after {
+        content: '';
+        display: block;
+        background-image: linear-gradient(to top, #fff, rgba(255,255,255,0.8));
+        width: 100%;
+        position: absolute;
+        bottom: 0;
+        height: 80px;
+        left: 0;
+    }
+</style>
 <% page.posts.each(function(post){ %>
-    <%- partial('common/article', { post, index: true }) %>
+    <%- partial('common/article', { post: {...post, slim: true}, index: true }) %>
 <% }); %>
 <% if (page.total > 1) { %>
     <%- partial('common/paginator') %>

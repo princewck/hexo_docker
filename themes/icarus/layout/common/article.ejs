@@ -6,7 +6,7 @@
         <%- index ? '</a>' : '</span>' %>
     </div>
     <% } %>
-    <div class="card-content article <%= post.hasOwnProperty('direction') ? post.direction : '' %>">
+    <div class="card-content article <%= post.slim ? 'slim' : '' %> <%= post.hasOwnProperty('direction') ? post.direction : '' %>">
         <% if (post.layout != 'page') { %>
         <div class="level article-meta is-size-7 is-uppercase is-mobile is-overflow-x-auto">
             <div class="level-left">

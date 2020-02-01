@@ -92,7 +92,7 @@ module.exports = function (hexo) {
 
     hexo.extend.helper.register('get_thumbnail', function (post) {
         const hasThumbnail = hexo.extend.helper.get('has_thumbnail').bind(this)(post);
-        return this.url_for(hasThumbnail ? post.thumbnail : 'images/thumbnail.svg');
+        return this.url_for(hasThumbnail ? post.thumbnail : 'images/protractor.jpeg');
     });
 
     hexo.extend.helper.register('has_og_image', function (post) {

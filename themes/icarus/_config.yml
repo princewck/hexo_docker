@@ -5,7 +5,7 @@ favicon: /images/favicon.svg
 # Path or URL to RSS atom.xml
 rss:
 # Path or URL to the website's logo to be shown on the left of the navigation bar or footer
-logo: /images/logo.svg
+logo: /images/logo.png
 # Open Graph metadata
 # https://hexo.io/docs/helpers.html#open-graph
 open_graph:
@@ -72,24 +72,12 @@ donate:
         # Donation entry name
         type: alipay
         # Qrcode image URL
-        qrcode: ''
+        qrcode: '/images/alipay.png'
     -
         # Donation entry name
         type: wechat
         # Qrcode image URL
-        qrcode: ''
-    -
-        # Donation entry name
-        type: paypal
-        # Paypal business ID or email address
-        business: ''
-        # Currency code
-        currency_code: USD
-    -
-        # Donation entry name
-        type: patreon
-        # URL to the Patreon page
-        url: ''
+        qrcode: '/images/wechat.png'
 # Share plugin settings
 # http://ppoffice.github.io/hexo-theme-icarus/categories/Configuration/Share-Plugins
 share:
@@ -102,7 +90,7 @@ sidebar:
     left:
         # Whether the left sidebar is sticky when page scrolls
         # http://ppoffice.github.io/hexo-theme-icarus/Configuration/Theme/make-a-sidebar-sticky-when-page-scrolls/
-        sticky: false
+        sticky: true
     # right sidebar settings
     right:
         # Whether the right sidebar is sticky when page scrolls
@@ -119,11 +107,11 @@ widgets:
         # Author name to be shown in the profile widget
         author: Chengkai
         # Title of the author to be shown in the profile widget
-        author_title: 王程凯
+        author_title: 程凯
         # Author's current location to be shown in the profile widget
         location: 上海 静安
         # Path or URL to the avatar to be shown in the profile widget
-        avatar: https://avatars3.githubusercontent.com/u/8393757?s=460&v=4
+        avatar: /images/avatar.png
         # Email address for the Gravatar to be shown in the profile widget
         gravatar:
         # Whether to show avatar image rounded or square
@@ -209,7 +197,7 @@ plugins:
     # http://ppoffice.github.io/hexo-theme-icarus/Plugins/General/site-analytics-plugin/#Baidu-Analytics
     baidu-analytics:
         # Baidu Analytics tracking id
-        tracking_id:
+        tracking_id: 
     # Hotjar user feedback plugin
     # http://ppoffice.github.io/hexo-theme-icarus/Plugins/General/site-analytics-plugin/#Hotjar
     hotjar:

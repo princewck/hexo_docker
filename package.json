@@ -8,7 +8,7 @@
   "scripts": {
     "start": "sh ./bin/start.sh",
     "stop": "sh ./bin/stop.sh",
-    "restart": "sh ./bin/stop.sh & sh ./bin/start.sh",
+    "restart": "sh ./bin/restart.sh",
     "deploy": "npx hexo clean &  npx hexo generate & npx hexo server"
   },
   "dependencies": {

@@ -444,12 +444,234 @@ createAction('FETCH_THING', async id => {
 >
 > 
 
-## 同构原理
+## React 服务端渲染
 
-ReactDOMServer
+服务端渲染(SSR for Server Side Render)是一种流行的同构方案，前端代码可以在服务端做渲染，前端在请求 HTML 时，直接返回渲染好的页面
 
-… 待补充
+##### 优点：
+
+- 利于SEO
+- 加速首屏渲染速度
+
+##### API：
+
+- `React.renderToString`
+- `React.renderToStaticMarkup`
+
+##### 提出问题
+
+假如你从未接触过服务器渲染，但是又有基本的React和后端以及NodeJS知识，你可能有以下疑问？
+
+> 1. 既然是同构，我们怎么在 NodeJS 环境运行 使用 ES6 modules 或 AMD等浏览器环境模块化技术编写的文件？
+> 2. 怎么把开发的东西变成服务器和客户端是两套运行时代码，并且让他们和谐地协同工作？
+> 3. 后端路由怎么认前端路由，根据对应路由渲染对应页面组件呢？
+> 4. 请求数据是在哪里？哪些数据请求在服务器做，哪些延迟到客户端浏览器里异步 fetch 呢？
+> 5. 浏览器和 Nodejs 的全局环境不太一样，会有哪些问题？
+> 6. 服务器渲染的过程中 React 的生命周期会有什么影响吗？服务器上和浏览器中是不是不一样？
+> 7. 首屏的数据服务器上已经渲染好了，只需要加一些事件绑定，那怎么让浏览器知道这个事实，跳过不必要的客户端渲染呢？
+> 8. 状态管理工具，比如 Redux 怎么集成到服务端渲染过程中呢？
+
+##### 感性认识
+
+为了有一个感性认识，了解如何使用 NodeJS 和 ReactDOMServer API 实现一个基础的服务端渲染项目，笔者在此提供一个简单的项目示例，通过比较少的配置实现一个基本的前后端同构的 React 程序。
+
+https://gitee.com/tricklew/react-ssr-from-scrach
+
+> 喜欢视频教程的同学可以观看这个视频寻找思路：
+>
+> https://www.youtube.com/watch?v=82tZAPMHfT4
+
+并下面针对此项目做一个渐进式的说明：
+
+###### 项目结构
+
+ 我们的项目结构是这样的：
+
+![image-20200209141517966](/images/redux/image-20200209141517966.png)
+
+-  `public`是我们的前端浏览器访问的内容，在我们服务的根路径可以访问其中的文件，比如 `localhost:3008/facts.json`，我们使用express 的 `express.static`来实现这个静态文件服务。
+
+- `server` 是我们最终编译打包的所有 Node 环境所需的运行时代码。
+- `src` 和 跟路径下的 `index.js` 是我们开发时需要编写的内容
+
+>  我们在构建过程中还会用到  babel 和 webpack
+
+###### 配置过程
+
+首先我们先创建前端代码，`src`路径下的三个文件是我们需要用到的，其中 `index.js`是整个前端应用的入口，在 `webpack.config.js`中，我们进行如下配置，另外别忘了跟路径的 babel 配置 `.babelrc`：
+
+```javascript
+// webpack.config.js
+module.exports = {
+  entry: './src/index.js',
+  output: {
+    filename: 'bundle.js',
+    path: __dirname + '/public',
+  },
+  module: {
+    loaders: [
+      { test: /\.js$/, loader: 'babel-loader', exclude: /node_module/ },
+      { test: /\.jsx$/, loader: 'babel-loader', exclude: /node_module/ },
+    ]
+  },
+};
+```
+
+```javascript
+// .babelrc
+{
+  "presets": [
+    "es2015",
+    "react"
+  ]
+}
+```
+
+然后在 `package.json`中添加 scripts：
+
+```json
+{
+  "buildClient": "node_modules/.bin/webpack"
+}
+```
+
+`npm install`安装整个项目的依赖后，运行 `npm run buildClient`，这样我们得到了一个`public/bundle.js`，这是我们需要在浏览器中使用的文件，在`public`中添加一个 `index.html`并引入该`js`:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>服务端渲染示例</title>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/javascript" src="bundle.js"></script>
+</body>
+</html>
+```
+
+这样，`public`路径下我们得到了一个我们熟悉的静态网站，我们可以运行 `npx serve ./public`测试一下。既然是服务端渲染，我们下一步一定是构建服务端代码，我们在跟路径创建服务端的入口文件，我们使用 ES Modules 的方式来编写，这样我们就可以用我们熟悉的方式引入前端组件了：
+
+```javascript
+import React from 'react';
+import { renderToString } from 'react-dom/server';
+import App from './src/App';
+import getFacts from './src/facts';
+import express from 'express';
+
+console.log('express', express);
+
+const app = express();
+const port = 3008;
+
+app.use('/static', express.static('public'));
+
+app.get('*', (req, res) => {
+  getFacts().then(facts => {
+    const html = renderToString(<App facts={ facts } />);
+    res.set('Cache-Control', 'publicm max-age=600, s-maxage=1200');
+    res.send(html);
+  })
+});
+
+app.listen(port, () => {
+  console.log('ssrApp start listening on port '+ port + ' !');
+});
+```
+
+接着，我们添加如下 `npm script`：
+
+```json
+"buildServer": "babel src -d server/src && babel index.js -d server"
+```
+
+试着运行它:
+
+```bash
+$npm run buildServer
+```
+
+检查一下，我们可以看到我们的前端组件和刚才试用 `ES Module`编写的文件被编译成了可以在 node 环境运行的 `CommonJS`形式，试着让它run起来：
+
+```bash
+$node ./server
+```
+
+访问 `localhost: 3008`我们发现我们的代码跑起来了，`option + command + U` 查看 html 源文件，我们可以看到页面到达浏览器时已经被服务器渲染好了。
+
+细心你的可能发现了，我们目前这样渲染出来的页面只有组件部分，没有`<html>`、`<body>`这些包裹，我们做一些小改造：
+
+- 把 index.html 复制到 `server`下，做少许改动
+
+```html
+// index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>服务端渲染示例</title>
+</head>
+<body>
+  <div id="root">
+  <!-- SSR_APP -->
+  </div>
+  <script type="text/javascript" src="bundle.js"></script>
+</body>
+</html>
+```
+
+```javascript
+import React from 'react';
+import { renderToString } from 'react-dom/server';
+import App from './src/App';
+import getFacts from './src/facts';
+import express from 'express';
+import * as fs from 'fs';
+import * as path from 'path';
+
+const app = express();
+const port = 3008;
+
+const portal = fs.readFileSync('./index.html', 'utf-8');
 
 
+app.use('/static', express.static(path.resolve(__dirname, '../public')));
 
-# 
+app.get('*', (req, res) => {
+  getFacts().then(facts => {
+    const html = renderToString(<App facts={ facts } />);
+    const finalHTML = portal.replace('<!-- SSR_APP -->', html);
+    res.set('Cache-Control', 'publicm max-age=600, s-maxage=1200');
+    res.send(finalHTML);
+  })
+});
+
+app.listen(port, () => {
+  console.log('ssrApp start listening on port '+ port + ' !');
+});
+```
+
+重新构建，然后启动：
+
+```bash
+$npm run buildServer
+$cd server
+$node .  # 或者有supervisor之类的工具也可以 e.g.  supervisor .
+```
+
+这时候再查看  html  源码，得到我们最终需要的 dom 结构：
+
+![image-20200209215949671](/images/redux/image-20200209215949671.png)
+
+我们刚才说  server 应当是包含完整的服务端部署，所以我们给他添加单独的 `package.json`，把服务端运行代码需要的依赖添加进去，`webpack`之类的前端构建依赖不用添加。
+
+到此为止，我们已经有了一个服务端渲染的基本骨架。只是目前只有一个页面，我们还需要研究配置多页面路由，如何处理数据。
+
+> 💡 上面「提出问题」列表中第1、2两个问题，我们已经初步有了答案。
+
+… // 未完待续

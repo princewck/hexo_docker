@@ -17,7 +17,7 @@ const font_providers = {
 };
 
 const icon_providers = {
-    fontawesome: '/css/font-awesome-4.7.0/css/font-awesome.min.css'
+    fontawesome: '/css/fontawesome-free-5.12.1-web/css/all.min.css'
 };
 
 module.exports = function (hexo) {

@@ -64,7 +64,7 @@ module.exports = function (hexo) {
     hexo.extend.helper.register('prep_article', function(content, slim) {
         if (!slim) return content;
         const $ = cheerio.load(content);
-        return $.text();
+        return $.text().replace(/</g, '&lt;').replace(/>/g, '&gt;');
     })
 
     hexo.extend.helper.register('md5', function (data) {

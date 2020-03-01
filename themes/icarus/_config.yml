@@ -27,7 +27,7 @@ navbar:
         '存档': /archives
         '分类': /categories
         '标签': /tags
-        '关于我': /about
+        # '关于我': /about
     # Navigation bar links to be shown on the right
     links:
         #Download on GitHub:
@@ -91,7 +91,7 @@ sidebar:
     left:
         # Whether the left sidebar is sticky when page scrolls
         # http://ppoffice.github.io/hexo-theme-icarus/Configuration/Theme/make-a-sidebar-sticky-when-page-scrolls/
-        sticky: true
+        sticky: false
     # right sidebar settings
     right:
         # Whether the right sidebar is sticky when page scrolls
@@ -144,14 +144,14 @@ widgets:
         type: toc
         # Where should the widget be placed, left or right
         position: left
-    -
-        # Widget name
-        type: links
-        # Where should the widget be placed, left or right
-        position: left
-        # Links to be shown in the links widget
-        links:
-            我的Github: 'https://github.com/princewck'
+    # -
+    #     # Widget name
+    #     type: links
+    #     # Where should the widget be placed, left or right
+    #     position: left
+    #     # Links to be shown in the links widget
+    #     links:
+    #         我的Github: 'https://github.com/princewck'
     -
         # Widget name
         type: category
@@ -166,17 +166,17 @@ widgets:
         # Widget name
         type: recent_posts
         # Where should the widget be placed, left or right
-        position: right
-    -
-        # Widget name
-        type: archive
-        # Where should the widget be placed, left or right
-        position: right
+        position: left
+    # -
+    #     # Widget name
+    #     type: archive
+    #     # Where should the widget be placed, left or right
+    #     position: left
     -
         # Widget name
         type: tag
         # Where should the widget be placed, left or right
-        position: right
+        position: left
 # Other plugin settings
 plugins:
     # Enable page animations

@@ -8,8 +8,6 @@ toc: true
 thumbnail: /images/nginx.jpg
 ---
 
-## web读书笔记：《 NGINX Cookbook》
-
 ### 一. 基础
 
 [链接：NGINX Cookbook英文原本官方下载](https://www.nginx.com/resources/library/complete-nginx-cookbook/?utm_source=nginxorg&utm_medium=homepagebanner&utm_campaign=complete_cookbook&_ga=2.145469041.478574807.1582991384-151531481.1582597691)

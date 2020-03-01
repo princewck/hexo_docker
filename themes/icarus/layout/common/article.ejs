@@ -44,8 +44,8 @@
                 <%= post.title %>
             <% } %>
         </h1>
-        <div class="content">
-            <%- index && post.excerpt ? post.excerpt : post.content %>
+        <div class="content <%=post.slim ? 'content-ellipsis': ''%>">
+            <%- index && post.excerpt ? post.excerpt : prep_article(post.content, post.slim) %>
         </div>
         <% if (!index && post.tags && post.tags.length) { %>
         <div class="level is-size-7 is-uppercase">

@@ -14,6 +14,7 @@
 const URL = require('url').URL;
 const moment = require('moment');
 const crypto = require('crypto');
+const cheerio = require('cheerio');
 
 module.exports = function (hexo) {
     hexo.extend.helper.register('is_same_link', function (a, b) {
@@ -59,6 +60,12 @@ module.exports = function (hexo) {
         content = content.trim();
         return content ? (content.match(/[\u00ff-\uffff]|[a-zA-Z]+/g) || []).length : 0;
     });
+
+    hexo.extend.helper.register('prep_article', function(content, slim) {
+        if (!slim) return content;
+        const $ = cheerio.load(content);
+        return $.text();
+    })
 
     hexo.extend.helper.register('md5', function (data) {
         return crypto.createHash('md5').update(data).digest("hex")

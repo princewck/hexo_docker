@@ -1,7 +1,8 @@
 ---
 title: 使用canvas实现最大内接矩形居中裁剪
 date: 2019-06-18 09:47:52
-tags: 前端开发
+tags: js技巧
+category: 前端开发
 thumbnail: /images/SEQUENCE.jpeg
 ---
 

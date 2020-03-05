@@ -1,7 +1,7 @@
 ---
 title: 2019年第35周
 date: 2019-09-01 17:54:07
-tags: 前端开发
+category: 前端开发
 thumbnail: /images/thumbnails/week35.jpeg
 ---
 

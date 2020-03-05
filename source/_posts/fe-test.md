@@ -1,7 +1,8 @@
 ---
 title: 前端测试基础
 date: 2017-08-13 18:09:05
-tags: 前端工程化,测试
+tags: js技巧
+category: 前端开发
 thumbnail: /images/protractor.jpeg
 ---
 

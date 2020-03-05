@@ -1,7 +1,8 @@
 ---
 title: React TransitionGroup的使用
 date: 2019-07-04 10:19:20
-tags: 周报 前端开发
+category: 前端开发
+tags: React js技巧
 thumbnail: /images/animate.gif
 ---
 

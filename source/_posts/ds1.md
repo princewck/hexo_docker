@@ -1,9 +1,9 @@
 ---
 title: 【数据结构-1】基础概念
 toc: true
-tags: mse 数据结构
+tags: 数据结构
+category: 计算机通识
 thumbnail: /images/thumbnails/ds1.jpeg
-category: '计算机基础'
 date: 2019-07-02 17:02:38
 ---
 

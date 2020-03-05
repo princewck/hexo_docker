@@ -1,8 +1,8 @@
 ---
 title: 日常代码片段记录
-tags: 代码片段
+tags: NodeJS https
 toc: true
-category: web开发
+category: 前端开发
 date: 2019-05-09 10:07:38
 thumbnail: /images/thumbnails/codesamples.jpeg
 ---

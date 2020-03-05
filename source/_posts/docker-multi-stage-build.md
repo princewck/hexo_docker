@@ -1,8 +1,8 @@
 ---
 title: 利用 Docker 多阶段搞定前端构建和部署
 date: 2020-03-05 22:26:10
-tags: 前端工程化
-category: 前端工程化
+category: 工程化和运维
+tags: Docker
 thumbnail: /images/docker.jpeg
 ---
 

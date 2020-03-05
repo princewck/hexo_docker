@@ -1,7 +1,8 @@
 ---
 title: iOS下使用iframe嵌套页面的bug
 date: 2019-09-04 10:22:24
-tags: 前端开发, H5
+category: 前端开发
+tags: js技巧 移动端H5
 thumbnail: /images/thumbnails/ios-bug.jpeg
 ---
 

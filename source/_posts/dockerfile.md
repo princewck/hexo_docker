@@ -1,9 +1,9 @@
 ---
 title: Dockerfile reference 笔记
 date: 2019-03-26 17:04:32
-tags: 后端,Docker
+tags: Docker
+category: 工程化和运维
 toc: true
-category: web开发
 thumbnail: /images/wpp3.jpeg
 ---
 

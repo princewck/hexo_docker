@@ -1,7 +1,8 @@
 ---
 title: 2019年39周记录
 date: 2019-09-26 10:37:52
-tags: 前端开发，周报
+tags: 移动端H5 js技巧
+category: 前端开发
 thumbnail: '/images/photo-1499343628900-545067aef5a3.jpeg'
 ---
 

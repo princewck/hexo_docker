@@ -1,7 +1,7 @@
 ---
 title: 在项目中愉快地使用svg图标
-tags: 前端工程化应用
-category: 前端开发,工程化
+tags: js技巧
+category: 前端开发
 date: 2019-04-26 09:45:56
 thumbnail: /images/wpp4.jpeg
 ---

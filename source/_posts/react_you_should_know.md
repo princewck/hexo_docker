@@ -1,7 +1,7 @@
 ---
 title: 理解React 技术栈
-tags: 前端开发
 category: 前端开发
+tags: React js技巧
 date: 2020-02-08 20:51:56
 thumbnail: /images/redux/thumb.jpeg
 ---

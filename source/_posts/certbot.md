@@ -1,9 +1,9 @@
 ---
 title: 未备案网站使用Certbot生成https证书
 toc: true
-tags: certbot-auto https
+tags: https
 thumbnail: /images/letsencrypt.png
-category: '运维技术'
+category: 工程化和运维
 date: 2019-07-02 17:02:38
 ---
 

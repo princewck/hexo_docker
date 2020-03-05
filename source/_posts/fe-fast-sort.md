@@ -1,7 +1,8 @@
 ---
 title: 快速排序的js实现
 date: 2017-06-18 18:14:12
-tags: 前端开发,数据结构与算法
+tags: 数据结构
+category: 计算机通识
 thumbnail: /images/order.jpeg
 ---
 

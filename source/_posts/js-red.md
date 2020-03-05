@@ -1,7 +1,8 @@
 ---
 title: JavaScript高级程序设计（第3版）要点总结
 date: 2020-02-01 17:09:05
-tags: 前端开发
+category: 前端开发
+tags: js技巧
 thumbnail: /images/protractor.jpeg
 ---
 

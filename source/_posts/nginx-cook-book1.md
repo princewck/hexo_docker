@@ -1,6 +1,6 @@
 ---
-title: 《Nginx Cookbook》读书笔记(上)
-date: 2020-03-01 11:12:05
+title: 《Nginx Cookbook》中文版
+date: 2020-03-16 01:18:05
 category: 运维技术
 tags: Nginx
 description: 《Nginx Cookbook》中文版
@@ -14,7 +14,7 @@ thumbnail: /images/nginx.jpg
 
 Nginx 分为开源版本和商业版本Plus
 
-相关推荐：[What’s the Difference between NGINX Open Source and NGINX Plus?](https://www.nginx.com/blog/whats-difference-nginx-foss-nginx-plus/)，我们这里主要记录开源版本的一些相关使用。
+相关推荐：[What’s the Difference between NGINX Open Source and NGINX Plus?](https://www.nginx.com/blog/whats-difference-nginx-foss-nginx-plus/)，我们这里主要摘录了部分开源版本的一些相关使用。
 
 #### 安装：
 
@@ -538,3 +538,450 @@ server {
 将缓存文件分割为 1M 大小的片段中，分割是根据 `proxy_cache_key`来进行的，Cache Slice 功能是为 H5 video 而设计的，前端视频加载时会使用`byte-range`流式地请求资源（状态码 206）。
 
 >  [Smart and Efficient Byte-Range Caching with NGINX & NGINX Plus](https://www.nginx.com/blog/smart-efficient-byte-range-caching-nginx/)
+
+
+
+### 五. 身份认证(Authentication)
+
+使用Nginx可以对客户端进行访问认证，使用Nginx对客户端进行认证减少了开发的负担，并且可以在请求到达业务服务之前对请求进行认证。NGINX开源版本可用的模块中包含了Basic Authentication 和 Authentication subrequests，商业版还提供了支持JWT的认证模块。
+
+#### HTTP Basic Authentication
+
+如何使用 Nginx 进行基本的 http 用户访问认证呢？
+
+首先按照下面形式创建一个文件，其中密码部分按照后面方式加密：
+
+```nginx
+# comment
+name1:password1
+name2:password2:comment
+name3:password3
+```
+
+第一个字段是用户名，第二个字段是密码，第三个是备注，备注是可选字段，字段之间用冒号分隔。NGINX可以识别多种不同形式的密码，其中一种是C语言中的 `crypt()`方法的调用结果，这个方法可以通过命令行`openssl passwd` 来进行调用，我们可以像下面这样创建一个密码。
+
+```nginx
+$ openssl passwd mypassword1234
+```
+
+编写完配置我们可以使用NGINX提供的 `auth_basic` 额 `auth_basic_user_file`来进行请求认证：
+
+```nginx
+location / {
+  auth_basic "private site";
+  auth_basic_user_file ./passwd;
+}
+```
+
+`auth_basic`  可以使用在 HTTP , location 上下文中，`auth_basic` 接受一个字符串作为参数，当一个用户没用认证时，浏览器会在popup弹窗中显示该文字，`auth_basic_user_file` 指定了一个配置文件的路径。
+
+> 除了上面的 openssl 工具，还可以使用 Apache 的 htpasswd命令来生成密码
+
+在浏览器中用户输入用户名和密码后，浏览器仅仅是对输入内容进行了base64编码，然后以`Authorization: Base [encodedSTRING]`这样的形式提交给服务器进行校验，所以使用basic authentication 时建议使用HTTPS以防止敏感信息的泄漏。
+
+#### Authentication Subrequests
+
+> nginx向第三方认证服务发送子请求进行认证后决定是否提供访问
+
+使用 `http_auth_request_module` 可以在提供服务前，项指定认证服务发送请求获取认证结果。示例：
+
+```nginx
+location /private/ {
+  auth_request /auth;
+  auth_request_set $auth_status $upstream_status;
+}
+
+location /auth {
+  internal;
+  proxy_pass http://auth-server;
+  proxy_pass_request_body off;
+  proxy_set_header: Content-Length "";
+  proxy_set_header: X-Origin-URI $requet_uri;
+}
+```
+
+`auth_request`指令的参数必须是一个本地的内部请求地址，通过`auth_request_set`指令可以设置一些变量。
+
+自请求返回的状态码将会作为客户端是否具有访问权限的依据，如果状态码为 200 代表认证成功，请求将被正常继续，如果状态码返回 `401`或者`401`，NGINX将会直接把该状态码发回给原始请求。
+
+如果认证服务不需要接受请求体，可以通过上面例子一样使用`proxy_pass_request_body`指令在子请求认证时丢弃请求体，这样可以减小请求大小并缩短响应时间，在丢弃请求体的同时，我们要将`Content-Length`的值设置为空。如果我们的认证服务想要知道原始请求的更多信息，可以通过`auth_request_set`指令设置额外Headers带一些变量传递给子请求。
+
+
+
+Nginx商业版还支持其他认证方式，如 JWT等，这里不做介绍。
+
+
+
+### 六. 安全控制
+
+安全在访问的不同层级都需要被考虑，一个坚实的安全模型必须建立在多层次的安全控制之上。这个部分我们将介绍一些NGINX中提供的可以帮助提高应用安全性的特性。
+
+#### 基于IP地址的访问控制
+
+```nginx
+location /admin/ {
+  deny 10.0.0.1;
+  allow 10.0.0.0/20;
+  allow 2001:0db8::/32;
+  deny: all;
+}
+```
+
+上面的配置允许 IPv4 地址 `10.0.0.0/20` 访问，并排出`10.0.0.1`，允许 IPV6 `2001:0db8::/32` 子网下的IPv6地址访问，对其他IP地址则会返回 `403`状态码。
+
+`allow`和 `deny`指令可以在 HTTP ， server， location 上下文中使用，设定的多条规则将会从上到下依次匹配，直到找到匹配的项。
+
+通常情况下，当我们需要保护一个资源禁止其被外部访问时，我们可以在一组 `allow` 中配置允许的内部 IP 地址，然后在后面加上 `deny: all`；
+
+#### 允许 CORS访问
+
+> 缩写CORS代表的是：Cross-Origin Resource Sharing 跨域资源共享
+
+由于浏览器的同源限制，网站一般是不允许直接访问其他域名下的资源的，允许跨域资源访问，可以解除这个限制，让不同域名的网站访问我们的资源。
+
+下面的配置，根据不同的请求方法来返回不同的请求头来支持 CORS：
+
+```nginx
+map $request_method $cors_method {
+  OPTIONS 11;
+  GET 1;
+  default 0;
+}
+
+server {
+  #...
+
+  location / {
+    if ($cors_method ~ '1') {
+      add_header 'Access-Control-Allow-Methods' 'GET,POST,OPTIONS';
+      add_header 'Access-Control-Allow-Origin' '*.example.com';
+      add_header 'Access-Control-Allow-Headers'
+        				 'DNT,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type';
+    }
+    if ($cors_method = '11') {
+      add_header 'Access-Control-Max-Age' 1728000;
+      add_header 'Content-Type' 'text/plain; charset=UTF-8';
+      add_header 'Content-Length' 0;
+      return 204;
+    }
+  }
+}
+```
+
+上面配置中配置了`Access-Control-Max-Age`设置预检OPTIONS请求的最大缓存时间为 1728000 秒，也就是20天，在此期间默认允许某个客户端进行跨域请求而不重新发送OPTIONS请求。
+
+> 如果一个请求是 `GET`，`HEAD`或`POST`请求，我们称之为简单请求，对于简单请求且没有包含一些额外的Headers，将不会发送 `OPTIONS`请求而直接检查 Origin，其他情况下浏览器将会在首次请求跨域资源时预先发送一个 OPTIONS请求来检查服务端对跨域访问的支持情况。
+
+
+
+#### 客户端加密
+
+利用SSL模块我们可以对访问进行加密，常见的SSL模块有 `ngx_http_ssl_module`，`ngx_stream_ssl_module`等。
+
+```nginx
+http { # All directives used below are also valid in stream
+  server {
+    listen 8443 ssl;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+    ssl_certificate /etc/nginx/ssl/example.pem;
+    ssl_certificate_key /etc/nginx/ssl/example.key;
+    ssl_certificate /etc/nginx/ssl/example.ecdsa.crt;
+    ssl_certificate_key /etc/nginx/ssl/example.ecdsa.key;
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_timeout 10m;
+  }
+}
+```
+
+上面配置设置了一个监听 8443端口通过SSL加密的服务器。`ssl_protocols TLSv1.2 TLSv1.3;`代表加密协议使用的版本。
+
+目前 SSL 已经被认为是不安全的来，TLS 协议是更推荐的选择。NGINX 使我们的服务和最终客户之间的传输变得更加安全。关于客户端加密的更多细节，在这里不做更多的深入，有兴趣可以找一些深入的资料来单独研究。
+
+> [Test Your SSL Configuration with SSL Labs SSL Test](https://www.ssllabs.com/ssltest/)
+>
+> [https://ssl-config.mozilla.org/](https://ssl-config.mozilla.org/)
+
+#### 和上游服务器间的加密
+
+当我们需要和我们上游的服务提供者之间进行加密通信时，我们可以使用 proxy 模块的一些ssl相关指令来配置SSL规则：
+
+```nginx
+location / {
+  proxy_pass https://upstream.example.com;
+  proxy_ssl_verify on;
+  proxy_ssl_verify_depth 2;
+  proxy_ssl_protocols TLSv1.2;
+}
+```
+
+> 这一块笔者没有实践过，就不多介绍了，后面再做补充
+
+
+
+#### HTTPS Redirects
+
+把所有http请求重定向到 HTTPS：
+
+```nginx
+server {
+  listen 80 default_server;
+  listen [::]:80 default_server;
+  server_name _;
+  return 301 https://$host$request_uri;
+}
+```
+
+正确配置 http 到 https的重定向是非常必要的，我们不需要重定向所有的请求，但是一些含有敏感信息的请求则必须做这样的重定向才能保证数据传输的安全性，例如登录接口`/login`等。
+
+
+
+#### HTTP Strict Transport Security
+
+通过设置请求头告诉浏览器，"永远不要使用HTTP发送请求"。
+
+```nginx
+add_header Strict-Transport-Security max-age=31536000;
+```
+
+通过设置 请求头`Strict-Transport-Security`可以告知浏览器，在给定的时间里不能使用 HTTP 发送请求，这样我们可以进一步增强网站的安全性。
+
+
+
+#### 设置可选择的多种访问获取方式
+
+>Satisfying Any Number of Security Methods
+
+直接看例子：
+
+```nginx
+location / {
+  satisfy any;
+  allow 192.168.1.0/24;
+  deny all;
+  auth_basic "closed site";
+  auth_basic_user_file conf/htpasswd;
+}
+```
+
+这里介绍的是 `satisfy`这个指令，`satisfy any`告诉NGINX，只要满足下面提供的任意一种情况，就可以正常请求资源。比如上面例子中只要满足 IP 符合 `192.168.1.0/24`或者提供指定的 basic auth 用户名密码就可以正常请求location为 `/` 开头的资源。
+
+类似地，设置 `satisfy: all`，则代表必须同时满足后面的所有条件才可以获得资源的访问权限。
+
+
+
+### 七. HTTP/2
+
+HTTP/2是对HTTP协议的主要修订。这个版本大部分的工作是集中在传输层,如使完整的请求和响应在一个TCP连接多路复用。通过HTTP报头的压缩性能获得了很大提升,并增加了请求优先级的定义。HTTP/2新增的另一个大的特性是支持服务端向客户端推送消息。下面会介绍一些基本的配置方法，例如如何用 NGINX 支持 HTTP/2和gRPC和消息推送的配置。
+
+#### 基本设置：让服务器支持 HTTP/2
+
+```nginx
+server {
+	listen 443 ssl http2 default_server;
+	ssl_certificate server.crt;
+	ssl_certificate_key server.key;
+}
+```
+
+只需要在 listen 指令添加 `http2`参数就可以开启 http2了，值得一提的是，虽然协议没有规定使用HTTP/2必须使用HTTPS，但是一些客户端实现仅支持在HTTPS网站中使用HTTP/2。另一个问题是，HTTP/2规范将部分 `TLS 1.2`列入了黑名单，如果使用了这些加密方式请求就会握手失败，Nginx 使用的默认加密方案不在黑名单中。配置完后如果想检查配置是否正确，可以在Chrome中安装一些可以提示当前网站是否使用HTTP/2的插件，或者使用命令行工具 `nghttp`进行测试。
+
+> [HTTP/2 RFC Blacklisted Ciphers](https://tools.ietf.org/html/rfc7540#appendix-A)
+>
+> [Chrome HTTP2 and SPDY Indicator Plugin](https://chrome.google.com/webstore/detail/http2-and-spdy-indicator/mpbpobfflnpcgagjijhmgnchggcjblin)
+>
+> [Firefox HTTP2 Indicator Add-on](https://addons.mozilla.org/en-US/firefox/addon/http2-indicator/)
+
+
+
+#### HTTP/2 服务端消息推送
+
+服务器主动推送消息给客户端
+
+```nginx
+server {
+  listen 443 ssl http2 default_server;
+  ssl_certificate server.crt;
+  ssl_certificate_key server.key;
+  root /usr/share/nginx/html;
+
+  location = /demo.html {
+    http2_push /style.css;
+    http2_push /image1.jpg;
+  }
+}
+```
+
+### 八. 容器化和微服务
+
+容器化技术在应用层实现了一种抽象，把应用依赖和环境的安装从部署阶段转移到了构建阶段。这是一种重要的技术革命，它可以让工程师们不再需要考虑程序运行的环境，以一种统一的方式去部署程序。NGINX 对容器化提供了跟好的支持。
+
+#### 使用官方 NGINX 镜像
+
+我么可以从 Docker Hub 上获取到 NGINX 官方镜像，快速地获得 NGINX 提供的服务。
+
+官方镜像包含了一些默认配置，想要修改这些配置有两种方法：
+
+- 使用volume 将本地自定义的配置文件路径挂载到容器中
+- 创建一个 Dockerfile 用 `ADD` 将本地配置文件添加到自定义的镜像中
+
+```bash
+$ docker run --name my-nginx -p 80:80 \
+	-v /path/to/content:/usr/share/nginx/html:ro -d nginx
+```
+
+上面命令将本地路径`/path/to/content`作为volume 挂载到容器中 `/user/share/nginx/html`并设置为只读（`ro`） ，只需一行命令就可以在容器中启动并运行一个 Nginx 服务器。
+
+
+
+#### 创建NGINX Dockerfile
+
+使用任何提供商的docker镜像，使用 `RUN` 命令安装 NGINX，使用 `ADD ` 命令添加 NGINX 配置文件，使用 `EXPOSE` 命令暴露指定的端口到容器外，使用 `CMD` 命令启动 NGINX。我们需要在前台运行NGINX，为了做到这一点我们可以在命令行添加 -g "daemon off;" 或者 在配置文件中添加 `daemon off` 配置。
+
+```dockerfile
+FROM centos:7
+
+# Install epel repo to get nginx and install nginx
+RUN yum -y install epel-release && \
+yum -y install nginx
+
+# add local configuration files into the image
+ADD /nginx-conf /etc/nginx
+
+EXPOSE 80 443
+
+CMD ["nginx"]
+```
+
+文件结构如下：
+
+```shell
+.
+├── Dockerfile
+└── nginx-conf
+├── conf.d
+│ └── default.conf # 配置文件中已经添加了 daemon off 配置
+├── fastcgi.conf
+├── fastcgi_params
+├── koi-utf
+├── koi-win
+├── mime.types
+├── nginx.conf
+├── scgi_params
+├── uwsgi_params
+└── win-utf
+```
+
+#### 使用环境变量
+
+在NGINX配置文件中引入环境变量，这样我们就可以在不同环境中使用同一个镜像了。
+
+我们可以通过 `ngx_http_perl_module` 模块来在 NGINX 中使用环境变量来设置自定义变量：
+
+```nginx
+daemon off;
+env APP_DNS;
+
+include /usr/share/nginx/modules/*.conf;
+#...
+http {
+  perl_set $upstream_app 'sub { return $ENV{"APP_DNS"}; }';
+  server {
+    ...
+    location / {
+      proxy_pass https://$upstream_app;
+    }
+  }
+}
+```
+
+> 安装 `ngx_http_perl_module`模块后才可以使用 `perl_set` 指令，可以使用时额外安装该模块或者从源代码构建并包含该模块
+
+下面例子我们系统的使用包管理工具动态安装了`ngx_http_perl_module`模块，我们安装的模块在 CentOS 系统下会被放置在 `/usr/lib64/nginx/modules/`路径下
+
+```dockerfile
+FROM centos:7
+
+# Install epel repo to get nginx and install nginx
+RUN yum -y install epel-release && \
+	yum -y install nginx nginx-mod-http-perl
+
+# add local configuration files into the image
+ADD /nginx-conf /etc/nginx
+
+EXPOSE 80 443
+
+CMD ["nginx"]
+```
+
+####  Kubernetes Ingress Controller
+
+> 暂时不熟，后面补充
+
+
+
+### 九. 日志
+
+#### 配置Access Log
+
+设置 access_log 的格式：
+
+```nginx
+http {
+  log_format geoproxy
+  '[$time_local] $remote_addr '
+  '$realip_remote_addr $remote_user '
+  '$request_method $server_protocol '
+  '$scheme $server_name $uri $status '
+  '$request_time $body_bytes_sent '
+  '$geoip_city_country_code3 $geoip_region '
+  '"$geoip_city" $http_x_forwarded_for '
+  '$upstream_status $upstream_response_time '
+  '"$http_referer" "$http_user_agent"';
+	#...
+}
+```
+
+这个日志格式被命名为 geoproxy ，它使用了许多内置的变量来展示NGINX的日志能力。
+
+- $time_local：请求时的服务器时间
+- $remote_addr：使用连接的IP地址
+- $realip_remote_addr：客户端的 IP ， geoip_proxy 或 realip_header 指令识别的 IP
+- $remote_user： Basic auth 的用户名
+- $request_method： 请求方法
+- $request_method：使用的协议，如 HTTP/1.1
+- $scheme : HTTP 或 HTTPS
+- $request_time： 请求处理时间（毫秒）
+-  $body_bytes_sent：发送给客户端的响应体大小
+-  $http_x_forwarded_for：请求是否是由其他代理转发过来的
+- $upstream_status：返回的状态码
+
+`log_format` 指令只能在 HTTP 上下文中使用，上面的日志格式打印出的日志会像下面的形式：
+
+```bash
+[25/Nov/2016:16:20:42 +0000] 10.0.1.16 192.168.0.122 Derek
+GET HTTP/1.1 http www.example.com / 200 0.001 370 USA MI
+"Ann Arbor" - 200 0.001 "-" "curl/7.47.0"
+```
+
+我们可以使用 `access_log` 来使用上面定义的日志格式：
+
+```nginx
+server {
+	access_log /var/log/nginx/access.log geoproxy;
+}
+```
+
+#### 错误日志
+
+使用 `error_log` 指令可以定义日志路径和日志等级：
+
+```nginx
+error_log /var/log/nginx/error.log warn;
+```
+
+上面的 warn 代表日志的等级，是一个可选参数。这个指令可以在所有除了 `if` 语句的上下文中使用。
+
+> 可用的日志等级有：`debug`， `info`，`notice`， `warn`，`error`， `crit`，`alert`，`emerg`。
+>
+> 其中 debug 级别的日志只有在运行时添加 `--with-debug` 这个 flag 时才可以使用。

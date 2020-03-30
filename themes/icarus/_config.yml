@@ -187,7 +187,7 @@ widgets:
             我的Github: 'https://github.com/princewck'
             邵天宇的博客: 'https://www.shaotianyu.com/'
             远亮的博客: 'http://www.wangyuanliang.com/'
-            [交换友链]: '/my_wechat.jpg'
+            [交换友链]: 'https://chengkai.wang/my_wechat.jpg'
             
 # Other plugin settings
 plugins:

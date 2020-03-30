@@ -177,6 +177,18 @@ widgets:
         type: tag
         # Where should the widget be placed, left or right
         position: left
+    -
+        # Widget name
+        type: links
+        # Where should the widget be placed, left or right
+        position: left
+        # Links to be shown in the links widget
+        links:
+            我的Github: 'https://github.com/princewck'
+            邵天宇的博客: 'https://www.shaotianyu.com/'
+            远亮的博客: 'http://www.wangyuanliang.com/'
+            [交换友链]: '/my_wechat.jpg'
+            
 # Other plugin settings
 plugins:
     # Enable page animations

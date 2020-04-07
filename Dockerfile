@@ -1,4 +1,4 @@
-FROM mhart/alpine-node
+FROM node:10
 
 LABEL author="princewck"
 
@@ -8,6 +8,7 @@ WORKDIR /app
 
 EXPOSE 4000/tcp
 
-RUN npm install -g yarn --registry="https://registry.npm.taobao.org"
+RUN yarn add -g node-sass --no-progress
+RUN npm install -g yarn
 RUN ["yarn", "install"]
 ENTRYPOINT ["npm", "run", "deploy"]

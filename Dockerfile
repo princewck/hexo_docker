@@ -8,5 +8,6 @@ WORKDIR /app
 
 EXPOSE 4000/tcp
 
-RUN ["npm", "install", "--registry", "https://registry.npm.taobao.org"]
+RUN npm install -g cnpm --registry="https://registry.npm.taobao.org"
+RUN ["cnpm", "install"]
 ENTRYPOINT ["npm", "run", "deploy"]

@@ -70,9 +70,8 @@ $ ssh server2
 
 最后所有可用的 ssh config 可以[在这里查看](https://man.openbsd.org/OpenBSD-current/man5/ssh_config.5)
 
-### 
 
-###ssh连接超时
+### ssh连接超时
 
 一段时间没有操作时，ssh连接会超时并报` Broken pipe`，主要有以下三种方法来解决：
 
